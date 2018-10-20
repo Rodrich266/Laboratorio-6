@@ -11,18 +11,23 @@ for (libreria in c("tm","twitteR","ROAuth","ggplot2","wordcloud","RCurl","RWeka"
   }
 }
 
+#Por reproducibilidad, se recomienda correr el código desde la sección de limpieza y preprocesamiento
+#Sin embargo, se muestra el código utilizado para obtener los tweets a continuación:
+
 #------------------------ Autenticación en Twitter -----------------------------------#
+
 #Se colocan las claves, tokens y llaves proporcionadas por Twitter en variables
 consumerKey <- "ck"
 consumerSecret <- "cs"
 
 accessToken <- "at"
-accessTokenSecret <- "ats"
+accessTokenSecret <-	"ats"
 
 #Se inicializa el proceso de autenticación
 setup_twitter_oauth(consumerKey,consumerSecret,accessToken,accessTokenSecret)
 
 #---------------------------- Lectura de Datos ---------------------------------------#
+
 #Se buscan los tweets del usuario designado
 Tweets <- searchTwitteR("traficogt",n=150,lang = "es")
 
@@ -38,8 +43,14 @@ write.csv(Datos,"Tweets.csv")
 
 #-------------------------- Limpieza y preprocesamiento ------------------------------#
 
+#Por reproducibilidad, se coloca el csv de tweets originales en una variable para no sobreescribir los tweets con el código
+Datos <- read.csv("Tweets.csv")
+
+#Se eliminan las columnas de datos no relevantes
+Datos <- subset(Datos, select=-c(X,id,replyToUID,replyToSID,statusSource))
+
 #Se realiza un vector de los datos y se convierten en volátiles para cambiar su contenido
-VectorDatos <- VectorSource(Datos)
+VectorDatos <- VectorSource(Datos$text)
 DatosLimpios <- VCorpus(VectorDatos)
 
 #Preparar transformación
