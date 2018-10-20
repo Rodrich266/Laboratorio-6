@@ -12,12 +12,14 @@ for (libreria in c("tm","twitteR","ROAuth","ggplot2","wordcloud","RCurl")) {
 }
 
 #------------------------ Autenticación en Twitter -----------------------------------#
-consumerKey<-"consumerKey"
-consumerSecret<-"consumerSecret"
+#Se colocan las claves, tokens y llaves proporcionadas por Twitter en variables
+consumerKey<-"DHu9yAlQqkzr4F0NxwIXv8nVG"
+consumerSecret<-"3UQiydJWLfO6MHHPMKiUvCDWKoRhdjVlHxyPJQHPWVh7rcjhE2"
 
-accessToken <-	"accessToken"
-accessTokenSecret <-	"accessTokenSecret"
+accessToken <-	"304409498-BJ0xyhyDKmyraKbNnU2ak2H2jVqwMuEi7hrHHGcy"
+accessTokenSecret <-	"m7wYwjgzvnlz68vJo3BYIOJdZnSD6QbjVQcQYKz33mjrP"
 
+#Se inicializa el proceso de autenticación
 setup_twitter_oauth(consumerKey,consumerSecret,accessToken,accessTokenSecret)
 
 #---------------------------- Lectura de Datos ---------------------------------------#
@@ -25,9 +27,9 @@ setup_twitter_oauth(consumerKey,consumerSecret,accessToken,accessTokenSecret)
 Tweets <- searchTwitteR("traficogt",n=150,lang = "es")
 
 #Se pasan a un dataframe
-Datos<-twListToDF(Tweets)
+Datos <- twListToDF(Tweets)
 
-#Se proporciona una dimensión para los datos
+#Se agrega la fecha y la hora de cada tweet, en la zona horaria de Guatemala
 dif_UTC_gt <- 6*60*60
 Datos$created2 <- Datos$created-dif_UTC_gt
 
@@ -44,10 +46,10 @@ DatosLimpios <- VCorpus(VectorDatos)
 DatosLimpios <- tm_map(DatosLimpios, content_transformer(function(x) iconv(x, to='UTF-8', sub='byte')))
 
 #Se transforman los caracteres a minúsculas
-DatosLimpios<-tm_map(DatosLimpios, content_transformer(tolower))
+DatosLimpios < -tm_map(DatosLimpios, content_transformer(tolower))
 
 #Se eliminan los espacios en blanco adicionales
-DatosLimpios<-tm_map(DatosLimpios, content_transformer(stripWhitespace))
+DatosLimpios <- tm_map(DatosLimpios, content_transformer(stripWhitespace))
 
 #Se eliminan los URLs, se detiene al encontrar un espacio
 RemoverURL <- content_transformer(function(x) gsub("(f|ht)tp(s?)://\\S+", "", x, perl=T))
@@ -58,13 +60,13 @@ DatosLimpios <- tm_map(DatosLimpios, Espacio, "@")
 DatosLimpios <- tm_map(DatosLimpios, Espacio, "\\|")
 
 #Se eliminan las puntuaciones y símbolos
-DatosLimpios<-tm_map(DatosLimpios, content_transformer(removePunctuation))
+DatosLimpios <- tm_map(DatosLimpios, content_transformer(removePunctuation))
 
 #Se eliminan los números para que no interfieran con la predicción
 #DatosLimpios<-tm_map(DatosLimpios, content_transformer(removeNumbers)) #Depende del tema
 
 #Se eliminan artículos, preposiciones y conjunciones (stopwords)
-DatosLimpios<-tm_map(DatosLimpios, removeWords, stopwords('spanish'))
+DatosLimpios <- tm_map(DatosLimpios, removeWords, stopwords('spanish'))
 
 #------------------------ Análisis Exploratorio -----------------------------------#
 
