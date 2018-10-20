@@ -4,7 +4,7 @@
 #------------------------------------------------------------#
 
 #----- Instalación e importación de librerias necesarias para correr el programa ----#
-for (libreria in c("tm","twitteR","ROAuth","ggplot2","wordcloud","RCurl")) {
+for (libreria in c("tm","twitteR","ROAuth","ggplot2","wordcloud","RCurl","RWeka")) {
   if (!require(libreria, character.only=T)) {
     install.packages(libreria)
     library(libreria, character.only=T)
@@ -13,11 +13,11 @@ for (libreria in c("tm","twitteR","ROAuth","ggplot2","wordcloud","RCurl")) {
 
 #------------------------ Autenticación en Twitter -----------------------------------#
 #Se colocan las claves, tokens y llaves proporcionadas por Twitter en variables
-consumerKey<-"DHu9yAlQqkzr4F0NxwIXv8nVG"
-consumerSecret<-"3UQiydJWLfO6MHHPMKiUvCDWKoRhdjVlHxyPJQHPWVh7rcjhE2"
+consumerKey <- "ck"
+consumerSecret <- "cs"
 
-accessToken <-	"304409498-BJ0xyhyDKmyraKbNnU2ak2H2jVqwMuEi7hrHHGcy"
-accessTokenSecret <-	"m7wYwjgzvnlz68vJo3BYIOJdZnSD6QbjVQcQYKz33mjrP"
+accessToken <- "at"
+accessTokenSecret <- "ats"
 
 #Se inicializa el proceso de autenticación
 setup_twitter_oauth(consumerKey,consumerSecret,accessToken,accessTokenSecret)
@@ -46,7 +46,7 @@ DatosLimpios <- VCorpus(VectorDatos)
 DatosLimpios <- tm_map(DatosLimpios, content_transformer(function(x) iconv(x, to='UTF-8', sub='byte')))
 
 #Se transforman los caracteres a minúsculas
-DatosLimpios < -tm_map(DatosLimpios, content_transformer(tolower))
+DatosLimpios <- tm_map(DatosLimpios, content_transformer(tolower))
 
 #Se eliminan los espacios en blanco adicionales
 DatosLimpios <- tm_map(DatosLimpios, content_transformer(stripWhitespace))
