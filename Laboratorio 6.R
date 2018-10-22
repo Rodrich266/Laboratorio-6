@@ -4,7 +4,7 @@
 #------------------------------------------------------------#
 
 #----- Instalación e importación de librerias necesarias para correr el programa ----#
-for (libreria in c("tm","twitteR","ROAuth","ggplot2","wordcloud","RCurl","RWeka")) {
+for (libreria in c("tm","twitteR","ROAuth","ggplot2","wordcloud","RCurl","RWeka","topicmodels","data.table")) {
   if (!require(libreria, character.only=T)) {
     install.packages(libreria)
     library(libreria, character.only=T)
@@ -150,4 +150,36 @@ wordcloud(words = DFU$word, freq = DFU$freq, min.freq = 1,
           max.words=200, random.order=FALSE, rot.per=0.35, 
           colors=brewer.pal(8, "Dark2"))
 
+
+#Encontrar palabras asociadas a trafico, pmt, accidentes y carretera.
+findAssocs(Unigrama,"trafico",0.2)
+findAssocs(Unigrama,"pmt",0.2)
+findAssocs(Unigrama,"accidente",0.2)
+findAssocs(Unigrama,"carretera",0.2)
+
+
+#topic modelling, se crean 8 topicos de acuerdo a datos en comun.
+dtm <- as.DocumentTermMatrix(Unigrama)
+lda <- LDA(dtm, k=8)
+term <- terms(lda,7)
+(term <- apply(term, MARGIN = 2, paste, collapse = ","))
+
+#se visualizan estos topicos, como todos los tweets fueron tomados el mismo dia, sale solo una columna en la grafica, pero si 
+#se hubiesen tomado en un periodo de tiempo si se podria visualizar. Esto se conoce como stream graph.
+topics <- topics(lda)
+topics <- data.frame(date = as.IDate(Datos$created)  ,topic=topics)
+ggplot(topics,aes(date,fill=term[topic]))+geom_density(position = "stack")
+
+
+#graficar los tweets mas retweeteados, eje y es para la cantidad de veces retweeteados y el eje x es para la hora en la que fueron tweeteados.
+table(Datos$retweetCount)
+selected<-which(Datos$retweetCount >= 10)
+
+dates<-strptime(Datos$created, format = "%Y - %m - %d")
+plot(x = dates, y=Datos$retweetCount, type="l",col="grey",
+     xlab="Fecha",ylab = "Veces Retweeteados")
+colors <- rainbow(10)[1:length(selected)]
+points(dates[selected],Datos$retweetCount[selected],pch=19,col=colors)
+text(dates[selected],Datos$retweetCount[selected],Datos$text[selected],col=colors,
+     cex=.9)
 
