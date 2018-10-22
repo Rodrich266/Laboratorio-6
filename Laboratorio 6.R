@@ -84,6 +84,13 @@ DatosLimpios <- tm_map(DatosLimpios, removeWords, stopwords('spanish'))
 #Tokenización de Unigramas
 UnigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=1, max=1))
 
+#Tokenización de Bigramas
+BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
+
+#Tokenización de Trigramas
+TrigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min=3, max=3))
+
+
 #Función para obtener las frecuencias de cada palabra
 Frecuencia <- function(tdm){
   Frec <- sort(rowSums(as.matrix(tdm)), decreasing=TRUE)
@@ -96,6 +103,18 @@ Unigrama <- removeSparseTerms(TermDocumentMatrix(DatosLimpios, control = list(to
 
 #Se obtienen las frecuencias de los unigramas
 FrecUnigrama <- Frecuencia(Unigrama)
+
+#Remoción de bigramas que reaparecen menos de una vez
+Bigrama <- removeSparseTerms(TermDocumentMatrix(DatosLimpios, control = list(tokenize = BigramTokenizer)), 0.9999)
+
+#Se obtienen las frecuencias de los bigramas
+FrecBigrama <- Frecuencia(Bigrama)
+
+#Remoción de trigramas que reaparecen menos de una vez
+Trigrama <- removeSparseTerms(TermDocumentMatrix(DatosLimpios, control = list(tokenize = TrigramTokenizer)), 0.9999)
+
+#Se obtienen las frecuencias de los trigramas
+FrecTrigrama <- Frecuencia(Trigrama)
 
 #Función para graficación de los datos
 PlotFrec <- function(data, title) {
@@ -111,6 +130,12 @@ PlotFrec <- function(data, title) {
 #Unigramas
 PlotFrec(FrecUnigrama, "Unigramas más comúnes (Top 25)")
 
+#Bigramas
+PlotFrec(FrecBigrama, "Bigramas más comúnes (Top 25)")
+
+#Trigramas
+PlotFrec(FrecTrigrama, "Trigramas más comúnes (Top 25)")
+
 #--------------------------------- Wordclouds ---------------------------------------------#
 
 #Unigrama
@@ -124,3 +149,5 @@ head(DFU, 10)
 wordcloud(words = DFU$word, freq = DFU$freq, min.freq = 1,
           max.words=200, random.order=FALSE, rot.per=0.35, 
           colors=brewer.pal(8, "Dark2"))
+
+
