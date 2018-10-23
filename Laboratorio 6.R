@@ -73,11 +73,11 @@ DatosLimpios <- tm_map(DatosLimpios, Espacio, "\\|")
 #Se eliminan las puntuaciones y símbolos
 DatosLimpios <- tm_map(DatosLimpios, content_transformer(removePunctuation))
 
-#Se eliminan los números para que no interfieran con la predicción
-#DatosLimpios<-tm_map(DatosLimpios, content_transformer(removeNumbers)) #Depende del tema
-
 #Se eliminan artículos, preposiciones y conjunciones (stopwords)
 DatosLimpios <- tm_map(DatosLimpios, removeWords, stopwords('spanish'))
+
+#Se eliminan unas palabras que interfieren con el análisis
+DatosLimpios <- tm_map(DatosLimpios, removeWords, c("traficogt","tráficogt","u0001f6d1","rt"))
 
 #------------------------ Análisis Exploratorio -----------------------------------#
 
@@ -150,7 +150,7 @@ wordcloud(words = DFU$word, freq = DFU$freq, min.freq = 1,
           max.words=200, random.order=FALSE, rot.per=0.35, 
           colors=brewer.pal(8, "Dark2"))
 
-
+#-------------------------- Gráficas adicionales ------------------------------------------#
 #Encontrar palabras asociadas a trafico, pmt, accidentes y carretera.
 findAssocs(Unigrama,"trafico",0.2)
 findAssocs(Unigrama,"pmt",0.2)
@@ -183,3 +183,43 @@ points(dates[selected],Datos$retweetCount[selected],pch=19,col=colors)
 text(dates[selected],Datos$retweetCount[selected],Datos$text[selected],col=colors,
      cex=.9)
 
+#-------------------------- Predictor de Texto -------------------------------------------#
+
+PredictNext <- function(input){
+  input <- tolower(input)
+  input <- unlist(strsplit(as.character(input), ' '))
+  n <- length(input)
+  if(n >= 4 & nrow(DT5[base == paste(input[n-3], input[n-2], input[n-1], input[n], sep = " "),]) > 0){
+    new <- DT5[.(paste(input[n-3], input[n-2], input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(nrow(DT4[base == paste(input[n-2], input[n-1], input[n], sep = " "),]) > 0) {
+    new <- DT4[.(paste(input[n-2], input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(nrow(DT3[base == paste(input[n-1], input[n], sep = " "),]) > 0){
+    new <- DT3[.(paste(input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(nrow(DT2[base == paste(input[n], sep = ""),]) > 0){
+    new <- DT2[.(paste(input[n], sep = "")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(n == 3 & nrow(DT4[base == paste(input[n-2], input[n-1], input[n], sep = " "),]) > 0){
+    new <- DT4[.(paste(input[n-2], input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(nrow(DT3[base == paste(input[n-1], input[n], sep = " "),]) > 0) {
+    new <- DT3[.(paste(input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(nrow(DT2[base == paste(input[n], sep = ""),]) > 0){
+    new <- DT2[.(paste(input[n], sep = "")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(n == 2 & nrow(DT3[base == paste(input[n-1], input[n], sep = " "),]) > 0){
+    new <- DT3[.(paste(input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(nrow(DT2[base == paste(input[n], sep = ""),]) > 0) {
+    new <- DT2[.(paste(input[n], sep = "")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else if(n == 1 & nrow(DT2[base == paste(input[n], sep = " "),]) > 0){
+    new <- DT2[.(paste(input[n], sep = " ")), head(.SD, 3), on = "base"]
+    return(new[, predict])
+  } else{
+    return("Unknown")
+  }
+}
