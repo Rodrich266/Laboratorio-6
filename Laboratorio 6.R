@@ -177,7 +177,7 @@ selected<-which(Datos$retweetCount >= 10)
 
 dates<-strptime(Datos$created, format = "%Y - %m - %d")
 plot(x = dates, y=Datos$retweetCount, type="l",col="grey",
-     xlab="Fecha",ylab = "Veces Retweeteados")
+     xlab="Hora",ylab = "Veces Retweeteados")
 colors <- rainbow(10)[1:length(selected)]
 points(dates[selected],Datos$retweetCount[selected],pch=19,col=colors)
 text(dates[selected],Datos$retweetCount[selected],Datos$text[selected],col=colors,
