@@ -184,42 +184,9 @@ text(dates[selected],Datos$retweetCount[selected],Datos$text[selected],col=color
      cex=.9)
 
 #-------------------------- Predictor de Texto -------------------------------------------#
+#Se pide una palabra al usuario, esta se ingresa en la consola
+word <- readline(prompt="Ingresa una palabra: ")
 
-PredictNext <- function(input){
-  input <- tolower(input)
-  input <- unlist(strsplit(as.character(input), ' '))
-  n <- length(input)
-  if(n >= 4 & nrow(DT5[base == paste(input[n-3], input[n-2], input[n-1], input[n], sep = " "),]) > 0){
-    new <- DT5[.(paste(input[n-3], input[n-2], input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(nrow(DT4[base == paste(input[n-2], input[n-1], input[n], sep = " "),]) > 0) {
-    new <- DT4[.(paste(input[n-2], input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(nrow(DT3[base == paste(input[n-1], input[n], sep = " "),]) > 0){
-    new <- DT3[.(paste(input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(nrow(DT2[base == paste(input[n], sep = ""),]) > 0){
-    new <- DT2[.(paste(input[n], sep = "")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(n == 3 & nrow(DT4[base == paste(input[n-2], input[n-1], input[n], sep = " "),]) > 0){
-    new <- DT4[.(paste(input[n-2], input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(nrow(DT3[base == paste(input[n-1], input[n], sep = " "),]) > 0) {
-    new <- DT3[.(paste(input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(nrow(DT2[base == paste(input[n], sep = ""),]) > 0){
-    new <- DT2[.(paste(input[n], sep = "")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(n == 2 & nrow(DT3[base == paste(input[n-1], input[n], sep = " "),]) > 0){
-    new <- DT3[.(paste(input[n-1], input[n], sep = " ")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(nrow(DT2[base == paste(input[n], sep = ""),]) > 0) {
-    new <- DT2[.(paste(input[n], sep = "")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else if(n == 1 & nrow(DT2[base == paste(input[n], sep = " "),]) > 0){
-    new <- DT2[.(paste(input[n], sep = " ")), head(.SD, 3), on = "base"]
-    return(new[, predict])
-  } else{
-    return("Unknown")
-  }
-}
+#se utiliza findassocs para encontrar palabras relacionadas a la palabra que se ingreso
+#para esto se toma el unigrama y se toman todas aquellas con un indice mayor a 0.35
+findAssocs(Unigrama, word, .35)
